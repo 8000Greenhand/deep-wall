@@ -1,0 +1,113 @@
+05.16 00:34
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>后宫生存养成 MVP</title>
+  <style>
+    :root {
+      --bg: #18131f;
+      --panel: #241b2e;
+      --panel-2: #2d2239;
+      --text: #f4eefa;
+      --muted: #b8aac7;
+      --accent: #d19cff;
+      --danger: #ff8ca3;
+      --ok: #8ee6b4;
+      --border: #4d3e60;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(160deg, #120f18, #1d1527 40%, #140f1d);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 12px; }
+    .panel { background: rgba(36,27,46,.92); border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
+    .topbar { display:flex; flex-wrap: wrap; gap:8px; justify-content: space-between; align-items:center; }
+    .title { font-size: 1.1rem; font-weight: 700; }
+    .meta { color: var(--muted); font-size: .92rem; }
+    .btn-row { display:flex; gap:8px; flex-wrap: wrap; }
+    button {
+      background: var(--panel-2); color: var(--text); border:1px solid var(--border);
+      border-radius: 8px; padding: 8px 10px; cursor: pointer; min-height: 38px;
+    }
+    button:hover { border-color: var(--accent); }
+    button:disabled { opacity: .55; cursor:not-allowed; }
+    .grid { display:grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+    .stats-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:6px; }
+    .stat { background:#1c1525; border:1px solid #3d3150; border-radius: 8px; padding: 6px 8px; font-size: .9rem; }
+    .main-layout { display:grid; grid-template-columns: 2fr 1fr; gap: 10px; }
+    .scene-title { font-size: 1.08rem; font-weight:700; margin: 4px 0 8px; }
+    .scene, .result { color: #efe7f6; line-height: 1.55; }
+    .result { margin-top: 8px; color: #d9c5ea; }
+    .options, .locations { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .log { max-height: 210px; overflow:auto; background:#17111f; border:1px solid #3a2e4b; border-radius: 8px; padding: 8px; }
+    .log li { margin-bottom: 6px; color:#cab9da; font-size: .9rem; }
+    .npc-card { background:#1c1525; border:1px solid #3d3150; border-radius: 8px; padding: 8px; margin-bottom: 8px; }
+    details summary { cursor:pointer; }
+    .ending { border-color: var(--danger); }
+    .ending h3 { color: var(--danger); margin: 4px 0; }
+    .hint { color: var(--muted); font-size: .88rem; }
+    .ai-grid { display:grid; gap:8px; grid-template-columns: 1fr; margin-top:8px; }
+    input[type="text"], input[type="password"] {
+      width:100%; background:#17111f; border:1px solid #3d3150; color:var(--text);
+      border-radius: 8px; padding: 8px;
+    }
+    @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 360px) { .container { padding:8px; } button { padding:8px; font-size:.85rem; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="panel topbar">
+      <div>
+        <div class="title">后宫生存养成类 AI 文字游戏（MVP）</div>
+        <div class="meta" id="metaInfo">第1天｜寝宫</div>
+      </div>
+      <div class="btn-row">
+        <button id="newGameBtn">新开局</button>
+        <button id="saveBtn">保存</button>
+        <button id="loadBtn">读档</button>
+        <button id="settingsBtn">设置</button>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="panel">
+        <strong>玩家状态</strong>
+        <div id="playerIdentity" class="hint"></div>
+        <div id="stats" class="stats-grid"></div>
+      </div>
+      <div class="main-layout">
+        <div class="panel">
+          <div id="endingBox" class="panel ending" style="display:none;"></div>
+          <div id="eventBlock">
+            <div id="sceneTitle" class="scene-title"></div>
+            <div id="sceneText" class="scene"></div>
+            <div id="resultText" class="result"></div>
+            <div class="locations" id="locationButtons"></div>
+            <div class="options" id="optionButtons"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <strong>NPC 关系</strong>
+          <div id="npcRelations"></div>
+          <strong>历史日志</strong>
+          <ul id="logList" class="log"></ul>
+        </div>
+      </div>
+      <details class="panel" id="settingsPanel" style="display:none;">
+        <summary>AI 设置</summary>
+        <div class="ai-grid">
+          <label>API Key<input id="apiKeyInput" type="password" placeholder="sk-..." /></label>
+          <label>模型<input id="modelInput" type="text" placeholder="gpt-4o-mini" /></label>
+          <label><input id="aiEnabledInput" type="checkbox" /> 启用 AI 剧情润色</label>
+          <div class="btn-row">
+            <button id="saveSettingsBtn">保存设置</button>
+            <button id="clearKeyBtn">清除 API Key</button>
+          </div>
+          <div class="hint">无 Key 或请求失败时会自动使用本地模板，不影响可玩性。</div>
+
